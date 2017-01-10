@@ -1,4 +1,6 @@
 <h1>Infinario Android SDK</h1>
+[![Slack Status](http://community.exponea.com/badge.svg)](https://community.exponea.com/)
+<br />
 Infinario Android SDK is available in this Git repository: <a href="https://github.com/infinario/android-sdk">https://github.com/infinario/android-sdk</a>.
 <h2>Installation (Android Studio / Gradle)</h2>
 <ol>
