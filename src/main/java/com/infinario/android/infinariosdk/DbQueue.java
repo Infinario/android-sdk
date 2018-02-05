@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 
@@ -24,8 +22,8 @@ public class DbQueue {
     private Object lockAccess;
     private int openCounter;
 
-    public DbQueue(Context context) {
-        dbHelper = new DbHelper(context);
+    public DbQueue(Context context, String dbName) {
+        dbHelper = new DbHelper(context, dbName);
         lockAccess = new Object();
         openCounter = 0;
     }

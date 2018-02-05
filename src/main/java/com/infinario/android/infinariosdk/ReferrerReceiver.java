@@ -47,6 +47,6 @@ public class ReferrerReceiver extends BroadcastReceiver {
             return;
         }
 
-        Preferences.get(context).setReferrer(campaignId);
+        new Preferences(context, "").setReferrer(campaignId);
     }
 }

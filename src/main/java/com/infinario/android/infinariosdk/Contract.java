@@ -1,8 +1,5 @@
 package com.infinario.android.infinariosdk;
 
-import android.app.AlarmManager;
-import android.os.Build;
-
 /**
  * This file has been created by igi on 1/14/15.
  */
@@ -18,6 +15,11 @@ public class Contract {
     public static final String SDK = "AndroidSDK";
     public static final String VERSION = "1.1.4";
     public static final String OS = "Android";
+
+    /**
+     * Preference files -> each Infinario instance has it's own preferences
+     */
+    public static final String SHARED_PREF_FILES = "shared_preference_files";
 
     /**
      * Preferences details
@@ -74,7 +76,8 @@ public class Contract {
     public static final long FLUSH_DELAY = 10 * 1000;
     public static final int FLUSH_COUNT = 50;
     public static final boolean DEFAULT_AUTO_FLUSH = true;
-    public static int FLUSH_MIN_INTERVAL = 1000;
+  public static final java.lang.String PROJECT_PREFIX = "project_prefix";
+  public static int FLUSH_MIN_INTERVAL = 1000;
     public static int FLUSH_MAX_INTERVAL = 3600000;
 
     /**
@@ -97,13 +100,13 @@ public class Contract {
     public static final String COLUMN_COMMAND = "command";
     public static final String COLUMN_RETRIES = "retries";
 
-    public static final String DATABASE_NAME = "commands.db";
+    public static final String DATABASE_NAME_POSTFIX = "commands.db";
     public static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
     public static final String DATABASE_CREATE = "create table "
-            + TABLE_COMMANDS + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_COMMAND
-            + " text not null, " + COLUMN_RETRIES
-            + " integer not null default 0);";
+      + TABLE_COMMANDS + "(" + COLUMN_ID
+      + " integer primary key autoincrement, " + COLUMN_COMMAND
+      + " text not null, " + COLUMN_RETRIES
+      + " integer not null default 0);";
 }

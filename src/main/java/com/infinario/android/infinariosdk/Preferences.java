@@ -1,11 +1,12 @@
 package com.infinario.android.infinariosdk;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
+import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +14,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * This file has been created by igi on 2/18/15.
@@ -21,25 +21,20 @@ import java.util.UUID;
 public class Preferences {
 
     private Context context;
-    private static Preferences instance = null;
-    private static Object lockInstance = new Object();
-    private Object lockAccess;
+    private static final Object lockInstance = new Object();
+    private final Object lockAccess;
+    private final String mProjectPrefix;
 
-    private Preferences(Context context) {
+    /**
+     * Constructor
+     *
+     * @param context Application context.
+     * @param projectPrefix Project prefix to distinguish Infinario instances.
+     */
+    public Preferences(Context context, @NonNull String projectPrefix) {
         this.context = context;
+        mProjectPrefix = projectPrefix;
         lockAccess = new Object();
-    }
-
-    public static Preferences get(Context context) {
-        if (instance == null) {
-            synchronized (lockInstance) {
-                if (instance == null) {
-                    instance = new Preferences(context);
-                }
-            }
-        }
-
-        return instance;
     }
 
     /**
@@ -49,6 +44,27 @@ public class Preferences {
     private SharedPreferences getPreferences(Context context) {
         // This sample app persists the registration ID in shared preferences, but
         // how you store the regID in your app is up to you.
+
+        // Every Infinario instance has it's own shared preferences
+        String sharedPreferencesFileName = String.format(
+          "%s-%s", mProjectPrefix, Contract.PROPERTY);
+
+        synchronized (lockAccess) {
+            return context.getSharedPreferences(sharedPreferencesFileName, Context.MODE_PRIVATE);
+        }
+    }
+
+    /**
+     * Base infinario preferences to store properties
+     * that are common to many infinario projects
+     *
+     * @param context Application context.
+     * @return Base infinario SharedPreferences which is not project related
+     */
+    private SharedPreferences getBasePreferences(Context context) {
+        // This sample app persists the registration ID in shared preferences, but
+        // how you store the regID in your app is up to you.
+
         synchronized (lockAccess) {
             return context.getSharedPreferences(Contract.PROPERTY, Context.MODE_PRIVATE);
         }
@@ -60,7 +76,7 @@ public class Preferences {
      * @return sender ID or project number obtained from Google Developers Console
      */
     public String getSenderId() {
-        return getPreferences(context).getString(Contract.PROPERTY_SENDER_ID, null);
+        return getBasePreferences(context).getString(Contract.PROPERTY_SENDER_ID, null);
     }
 
     /**
@@ -69,7 +85,7 @@ public class Preferences {
      * @param senderId sender ID or project number obtained from Google Developers Console
      */
     public void setSenderId(String senderId) {
-        getPreferences(context).edit().putString(Contract.PROPERTY_SENDER_ID, senderId).commit();
+        getBasePreferences(context).edit().putString(Contract.PROPERTY_SENDER_ID, senderId).commit();
     }
 
     /**
@@ -78,7 +94,7 @@ public class Preferences {
      * @return referrer
      */
     public String getReferrer() {
-        return getPreferences(context).getString(Contract.PROPERTY_REFERRER, null);
+        return getBasePreferences(context).getString(Contract.PROPERTY_REFERRER, null);
     }
 
     /**
@@ -87,7 +103,7 @@ public class Preferences {
      * @param referrer referrer from INSTALL_REFERRER intent
      */
     public void setReferrer(String referrer) {
-        getPreferences(context).edit().putString(Contract.PROPERTY_REFERRER, referrer).commit();
+        getBasePreferences(context).edit().putString(Contract.PROPERTY_REFERRER, referrer).commit();
     }
 
     /**
@@ -106,24 +122,6 @@ public class Preferences {
      */
     public void setIcon(int iconDrawable) {
         getPreferences(context).edit().putInt(Contract.PROPERTY_ICON, iconDrawable).commit();
-    }
-
-    /**
-     * Gets token from preferences.
-     *
-     * @return token
-     */
-    public String getToken() {
-        return getPreferences(context).getString(Contract.PROPERTY_TOKEN, null);
-    }
-
-    /**
-     * Stores token in preferences.
-     *
-     * @param token token
-     */
-    public void setToken(String token) {
-        getPreferences(context).edit().putString(Contract.PROPERTY_TOKEN, token).commit();
     }
 
     /**
@@ -214,7 +212,8 @@ public class Preferences {
      * @return true if google push notifications are enabled, false otherwise
      */
     public boolean getGooglePushNotifications() {
-        return getPreferences(context).getBoolean(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS, Contract.DEFAULT_PUSH_NOTIFICATIONS);
+        return getPreferences(context).getBoolean(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS,
+          Contract.DEFAULT_PUSH_NOTIFICATIONS);
     }
 
     /**
@@ -223,7 +222,8 @@ public class Preferences {
      * @param value enabled / disabled
      */
     public void setGooglePushNotifications(boolean value) {
-        getPreferences(context).edit().putBoolean(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS, value).commit();
+        getPreferences(context).edit().putBoolean(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS, value)
+          .commit();
     }
 
     /**
@@ -267,10 +267,10 @@ public class Preferences {
         Log.i(Contract.TAG, "Saving regId on app version " + appVersion);
 
         getPreferences(context)
-                .edit()
-                .putString(Contract.PROPERTY_REG_ID, registrationId)
-                .putInt(Contract.PROPERTY_APP_VERSION, appVersion)
-                .commit();
+          .edit()
+          .putString(Contract.PROPERTY_REG_ID, registrationId)
+          .putInt(Contract.PROPERTY_APP_VERSION, appVersion)
+          .commit();
     }
 
     /**
@@ -373,19 +373,19 @@ public class Preferences {
     @SuppressWarnings("unused")
     public void clearStoredData() {
         getPreferences(context).edit()
-                .remove(Contract.PROPERTY_APP_VERSION)
-                .remove(Contract.PROPERTY_REG_ID)
-                .remove(Contract.PROPERTY_ICON)
-                .remove(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS)
-                .remove(Contract.PROPERTY_SENDER_ID)
-                .remove(Contract.PROPERTY_AUTO_FLUSH)
-                .remove(Contract.PROPERTY_SESSION_START)
-                .remove(Contract.PROPERTY_SESSION_END)
-                .remove(Contract.COOKIE)
-                .remove(Contract.CAMPAIGN_COOKIE)
-                .remove(Contract.PROPERTY_GOOGLE_ADV_ID)
-                .remove(Contract.PROPERTY_DEVICE_TYPE)
-                .commit();
+          .remove(Contract.PROPERTY_APP_VERSION)
+          .remove(Contract.PROPERTY_REG_ID)
+          .remove(Contract.PROPERTY_ICON)
+          .remove(Contract.PROPERTY_GOOGLE_PUSH_NOTIFICATIONS)
+          .remove(Contract.PROPERTY_SENDER_ID)
+          .remove(Contract.PROPERTY_AUTO_FLUSH)
+          .remove(Contract.PROPERTY_SESSION_START)
+          .remove(Contract.PROPERTY_SESSION_END)
+          .remove(Contract.COOKIE)
+          .remove(Contract.CAMPAIGN_COOKIE)
+          .remove(Contract.PROPERTY_GOOGLE_ADV_ID)
+          .remove(Contract.PROPERTY_DEVICE_TYPE)
+          .commit();
     }
 
     private Map<String, Object> jsonToMap(String json){
