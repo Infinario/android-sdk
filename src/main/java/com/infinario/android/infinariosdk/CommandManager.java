@@ -7,6 +7,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -17,23 +18,21 @@ import java.util.Set;
  */
 public class CommandManager {
 
-    private static final int MAX_RETRIES = 20;
-
     DbQueue queue;
     HttpHelper http;
     Preferences preferences;
-    Object lockFlush;
+    final Object lockFlush;
     boolean flushInProgress;
     boolean flushMayNeedRestart;
     AsyncTask<Void, Void, Void> flushTask;
 
-    public CommandManager(Context context, String target, String userAgent) {
+    public CommandManager(Context context, String target, String userAgent, Preferences preferences) {
         queue = new DbQueue(context);
-        preferences = Preferences.get(context);
+        this.preferences = preferences;
         http = new HttpHelper(target, userAgent);
         lockFlush = new Object();
 
-        synchronized (lockFlush){
+        synchronized (lockFlush) {
             flushInProgress = false;
             flushMayNeedRestart = false;
         }
@@ -75,8 +74,8 @@ public class CommandManager {
 
         StringBuilder logResult = new StringBuilder();
         logResult.append("Batch executed, ")
-                .append(requests.size())
-                .append(" prepared, ");
+          .append(requests.size())
+          .append(" prepared, ");
 
 
         if (data != null) {
@@ -105,17 +104,17 @@ public class CommandManager {
                     }
                 }
                 logResult.append(successfulRequests.size())
-                        .append(" succeeded, ")
-                        .append(deleteRequests.size() - successfulRequests.size());
+                  .append(" succeeded, ")
+                  .append(deleteRequests.size() - successfulRequests.size());
             } else {
                 Log.e(Contract.TAG, "Results are null");
                 logResult.append("0 succeeded, ")
-                        .append(requests.size());
+                  .append(requests.size());
             }
         } else {
             Log.e(Contract.TAG, "Data is null");
             logResult.append("0 succeeded, ")
-                    .append(requests.size());
+              .append(requests.size());
         }
 
         logResult.append(" failed, rest was told to retry");
@@ -154,8 +153,8 @@ public class CommandManager {
 
             synchronized (lockFlush) {
                 if (!flushMayNeedRestart) {
-                     flushInProgress = false;
-                     break;
+                    flushInProgress = false;
+                    break;
                 }
                 flushMayNeedRestart = false;
             }
@@ -183,8 +182,8 @@ public class CommandManager {
         int calculateDelay = timeInMiliseconds * 2;
 
         return Contract.FLUSH_MAX_INTERVAL < calculateDelay
-                ? Contract.FLUSH_MAX_INTERVAL
-                : calculateDelay;
+          ? Contract.FLUSH_MAX_INTERVAL
+          : calculateDelay;
     }
 
     private JSONObject setCookieId(JSONObject command) {

@@ -10,8 +10,8 @@ import android.util.Log;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
-    public DbHelper(Context context) {
-        super(context, Contract.DATABASE_NAME, null, Contract.DATABASE_VERSION);
+    public DbHelper(Context context, String dbName) {
+        super(context, dbName, null, Contract.DATABASE_VERSION);
     }
 
     @Override
@@ -22,10 +22,9 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(DbHelper.class.getName(),
-                "Upgrading database from version " + oldVersion + " to "
-                        + newVersion + ", which will destroy all old data");
+          "Upgrading database from version " + oldVersion + " to "
+            + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + Contract.TABLE_COMMANDS);
         onCreate(db);
     }
-
 }
