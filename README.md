@@ -1,5 +1,15 @@
-<h1>Infinario Android SDK</h1>
-Infinario Android SDK is available in this Git repository: <a href="https://github.com/infinario/android-sdk">https://github.com/infinario/android-sdk</a>.
+## NEW Android SDK - released
+New Exponea Android SDK is available at this Git repository: [https://github.com/exponea/exponea-android-sdk](https://github.com/exponea/exponea-android-sdk).
+We highly recommend to use new Android SDK, that Exponea actively supports. Exponea no longer supports the [old Android SDK](https://github.com/Infinario/android-sdk).
+### Features of new SDK
+* Support of all existing features as [old SDK](https://github.com/Infinario/android-sdk)
+* Full support of [Data API](https://developers.exponea.com/v2/reference)
+* Tracking (basic customer tracking, multiple projects tracking, tracking customers with custom IDs)
+* Push-notifications(automatic tracking (delivered, click status) with proper campaign_id)
+* Faster SDK configuration
+* Learn more about features in [documentation](https://github.com/exponea/exponea-android-sdk/blob/develop/README.md)
+
+
 <h2>Installation (Android Studio / Gradle)</h2>
 <ol>
 	<li>Download the <a href="https://github.com/infinario/android-sdk/releases">latest release</a> of the Android SDK</li>
